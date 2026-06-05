@@ -1,0 +1,133 @@
+mongodb:
+  uri: "mongodb://localhost:27017"
+  db_name: "hf_ai_engine"
+  pool_size: 10
+  timeout_ms: 5000
+
+markets:
+  US:
+    trading_days: 252
+    benchmark: "^GSPC"
+    vix_ticker: "^VIX"
+    risk_free_rate: 0.053
+    currency: "USD"
+    pe_fair_value: 18.0
+    pb_fair_value: 3.0
+    sector_etfs:
+      tech:       "XLK"
+      finance:    "XLF"
+      energy:     "XLE"
+      health:     "XLV"
+      consumer:   "XLY"
+      industrial: "XLI"
+      utility:    "XLU"
+  IN:
+    trading_days: 250
+    benchmark: "^NSEI"
+    vix_ticker: "INDIAVIX.NS"
+    risk_free_rate: 0.065
+    currency: "INR"
+    pe_fair_value: 22.0
+    pb_fair_value: 4.0
+    sector_etfs:
+      tech:   "NIFTYIT.NS"
+      bank:   "NIFTYBANK.NS"
+      pharma: "NIFTYPHARMA.NS"
+      auto:   "NIFTYAUTO.NS"
+      fmcg:   "NIFTYFMCG.NS"
+      metal:  "NIFTYMETAL.NS"
+
+data_sources:
+  prices:      yfinance
+  financials:  yfinance
+  ratios:      yfinance
+  insider_us:  sec_edgar
+  promoter_in: nse_portal
+  fii_dii:     nse_portal
+  bulk_deals:  nse_portal
+  macro_us:    fred_api
+  macro_in:    rbi_scraper
+  news:        news_scraper
+  filing_text: sec_edgar
+
+news_scraper:
+  google_news_rss: true
+  yahoo_finance_news: true
+  rss_feeds_us:
+    - "https://feeds.finance.yahoo.com/rss/2.0/headline"
+    - "https://www.wsj.com/xml/rss/3_7085.xml"
+  rss_feeds_in:
+    - "https://economictimes.indiatimes.com/markets/rss.cms"
+    - "https://www.moneycontrol.com/rss/marketsindia.xml"
+    - "https://www.business-standard.com/rss/markets-106.rss"
+    - "https://www.livemint.com/rss/markets"
+  max_articles_per_ticker: 50
+  lookback_days: 90
+  sentiment_engine: "finbert"
+
+engines:
+  technical:         { enabled: true,  weight: 0.20 }
+  fundamental:       { enabled: true,  weight: 0.15 }
+  valuation:         { enabled: true,  weight: 0.15 }
+  earnings_quality:  { enabled: true,  weight: 0.10 }
+  insider_sentiment: { enabled: true,  weight: 0.10 }
+  news_sentiment:    { enabled: true,  weight: 0.10 }
+  macro_context:     { enabled: true,  weight: null }
+  institutional_flow: { enabled: true,  weight: 0.10 }
+  buffett_screen:    { enabled: true,  weight: 0.01538 }
+  graham_screen:     { enabled: true,  weight: 0.01538 }
+  lynch_screen:      { enabled: true,  weight: 0.01538 }
+  fisher_screen:     { enabled: true,  weight: 0.01538 }
+  munger_screen:     { enabled: true,  weight: 0.01538 }
+  burry_screen:      { enabled: true,  weight: 0.01538 }
+  ackman_screen:     { enabled: true,  weight: 0.01538 }
+  wood_screen:       { enabled: true,  weight: 0.01538 }
+  druckenmiller:     { enabled: true,  weight: 0.01538 }
+  taleb_screen:      { enabled: true,  weight: 0.01538 }
+  damodaran_screen:  { enabled: true,  weight: 0.01538 }
+  pabrai_screen:     { enabled: true,  weight: 0.01538 }
+  jhunjhunwala:      { enabled: true,  weight: 0.01538 }
+
+risk:
+  vol_lookback_days: 60
+  min_confidence_to_trade: 40.0
+  min_coverage_weight: 0.30
+  vol_tiers:
+    low:        { threshold: 0.15, max_alloc: 0.25 }
+    medium_low: { threshold: 0.22, max_alloc: 0.20 }
+    medium:     { threshold: 0.30, max_alloc: 0.15 }
+    high:       { threshold: 0.50, max_alloc: 0.125 }
+    very_high:  { threshold: 99.0, max_alloc: 0.10 }
+  corr_high_threshold:  0.80
+  corr_low_threshold:   0.30
+  corr_high_multiplier: 0.70
+  corr_low_multiplier:  1.10
+
+aggregator:
+  buy_threshold_neutral: 0.15
+  buy_threshold_bearish: 0.25
+  buy_threshold_bullish: 0.10
+
+macro:
+  vix_bearish_threshold:      30
+  vix_bullish_threshold:      20
+  yield_spread_bearish:       -0.001
+  yield_spread_bullish:        0.001
+  sp500_vs_200ma_bearish:    -0.05
+  sp500_vs_200ma_bullish:     0.05
+  breadth_bearish:             0.35
+  breadth_bullish:             0.65
+  regime_multiplier_bearish:   0.80
+  regime_multiplier_bullish:   1.10
+  ttl_hours:                   6
+
+monitoring:
+  log_level: INFO
+  log_file: "logs/engine.log"
+  metrics_enabled: true
+
+ollama:
+  enabled: false
+  base_url: "http://localhost:11434"
+  model: "llama3.2:3b"
+  timeout_seconds: 10
